@@ -1,28 +1,68 @@
 import type { Metadata } from 'next'
 import './globals.css'
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examenbenin.vercel.app'
+const siteName = 'ExamBénin'
+const siteTitle = 'ExamBénin | Épreuves et révisions des examens nationaux du Bénin'
+const siteDescription =
+  'ExamBénin est une plateforme de préparation aux examens nationaux du Bénin avec des épreuves officielles, des documents de révision et des filtres par filière, session et année.'
+
 export const metadata: Metadata = {
-  title: 'ExamBénin — Prépare ton examen national',
-  description:
-    'Plateforme de préparation aux examens nationaux du Bénin. Épreuves ASSRI et SIL, sessions pratiques et théoriques, classées par année.',
-  keywords: ['bénin', 'examen', 'ASSRI', 'SIL', 'épreuves', 'révision', 'BAC', 'épreuve pratique', ' épreuve théorie'],
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: siteTitle,
+    template: `%s | ${siteName}`,
+  },
+  description: siteDescription,
+  applicationName: siteName,
+  referrer: 'origin-when-cross-origin',
+  keywords: [
+    'ExamBénin',
+    'exam benin',
+    'examen benin',
+    'épreuves Bénin',
+    'examens nationaux du Bénin',
+    'épreuves officielles Bénin',
+    'révision Bénin',
+    'ASSRI',
+    'SIL',
+    'BAC Bénin',
+    'épreuve pratique',
+    'épreuve théorique',
+  ],
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
-    title: 'ExamBénin',
-    description: 'Prépare ton examen national avec les vraies épreuves',
+    title: siteTitle,
+    description: siteDescription,
+    siteName,
     locale: 'fr_BJ',
     type: 'website',
-    url: '',
+    url: siteUrl,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: siteTitle,
+    description: siteDescription,
   },
   icons: {
-    icon:    '/favicon.svg',         // onglet navigateur
-    apple:   '/favicon.svg',         // iPhone/iPad
-    shortcut: '/favicon.svg',        // raccourci bureau
+    icon: '/favicon.svg',
+    apple: '/favicon.svg',
+    shortcut: '/favicon.svg',
   },
-  // Permet aux moteurs de recherche d'indexer le site
   robots: {
-    index:  true,
+    index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
   },
+  category: 'education',
 }
 
 export default function RootLayout({
@@ -30,9 +70,29 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: siteName,
+    url: siteUrl,
+    description: siteDescription,
+    inLanguage: 'fr-BJ',
+    publisher: {
+      '@type': 'Organization',
+      name: siteName,
+      url: siteUrl,
+    },
+  }
+
   return (
     <html lang="fr">
-      <body>{children}</body>
+      <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+        {children}
+      </body>
     </html>
   )
 }
