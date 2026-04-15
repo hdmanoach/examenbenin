@@ -2,7 +2,7 @@
 
 Plateforme Next.js moderne pour consulter et télécharger les épreuves des filières **ASSRI** et **SIL**, classées par session (pratique/théorique) et par année.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/TON_USERNAME/epreuves-bj)
+[![Deploy with Vercel](https://vercel.com/button)](https://examenbenin.vercel.app/)
 
 ---
 
