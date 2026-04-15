@@ -6,6 +6,7 @@ const siteName = 'ExamBénin'
 const siteTitle = 'ExamBénin | Épreuves et révisions des examens nationaux du Bénin'
 const siteDescription =
   'ExamBénin est une plateforme de préparation aux examens nationaux du Bénin avec des épreuves officielles, des documents de révision et des filtres par filière, session et année.'
+const googleSiteVerification = process.env.GOOGLE_SITE_VERIFICATION
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -61,6 +62,9 @@ export const metadata: Metadata = {
       'max-snippet': -1,
       'max-video-preview': -1,
     },
+  },
+  verification: {
+    google: googleSiteVerification,
   },
   category: 'education',
 }
