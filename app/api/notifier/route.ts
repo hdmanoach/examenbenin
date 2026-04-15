@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
 import { createClient } from '@supabase/supabase-js'
+import { formatError, sendAdminAlert } from '@/app/lib/monitoring'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -196,6 +197,16 @@ export async function POST(req: NextRequest) {
       logError('❌ Erreur Supabase:', error.message)
       logError('   Code:', error.code)
       logError('   Details:', error)
+      await sendAdminAlert({
+        subject: '[ExamBenin] Echec notifier: base de donnees',
+        summary: 'La route /api/notifier ne peut pas recuperer les abonnes actifs.',
+        details: {
+          source: '/api/notifier',
+          etape: 'lecture abonnes',
+          erreur: error.message,
+          code: error.code || 'inconnu',
+        },
+      })
       throw new Error(error.message)
     }
 
@@ -238,6 +249,18 @@ export async function POST(req: NextRequest) {
     console.log(`✅ ${nbEnvoyes} email(s) envoyé(s), ${nbErreurs} erreur(s)`)
 
     if (nbEnvoyes === 0) {
+      await sendAdminAlert({
+        subject: '[ExamBenin] Echec notifier: aucun email envoye',
+        summary: 'La notification a echoue pour tous les abonnes.',
+        details: {
+          source: '/api/notifier',
+          titre,
+          type,
+          nbAbonnes: abonnes.length,
+          nbErreurs,
+        },
+      })
+
       return repondre({
         succes: false,
         message: 'Aucun email n\'a pu etre envoye. Verifie GMAIL_USER / GMAIL_APP_PASSWORD.',
@@ -250,6 +273,14 @@ export async function POST(req: NextRequest) {
 
   } catch (err) {
     console.error('Erreur notification:', err)
+    await sendAdminAlert({
+      subject: '[ExamBenin] Echec notifier: erreur interne',
+      summary: 'La route /api/notifier a leve une erreur interne.',
+      details: {
+        source: '/api/notifier',
+        erreur: formatError(err),
+      },
+    })
     return repondre({ succes: false, message: 'Erreur interne lors de la notification.' }, 500)
   }
 }
