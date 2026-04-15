@@ -235,7 +235,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    log(`✅ ${nbEnvoyes} email(s) envoyé(s), ${nbErreurs} erreur(s)`)
+    console.log(`✅ ${nbEnvoyes} email(s) envoyé(s), ${nbErreurs} erreur(s)`)
 
     if (nbEnvoyes === 0) {
       return repondre({
@@ -249,7 +249,7 @@ export async function POST(req: NextRequest) {
     return repondre({ succes: true, nbEnvoyes, nbErreurs })
 
   } catch (err) {
-    logError('Erreur notification:', err)
+    console.error('Erreur notification:', err)
     return repondre({ succes: false, message: 'Erreur interne lors de la notification.' }, 500)
   }
 }
