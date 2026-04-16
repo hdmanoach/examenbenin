@@ -4,17 +4,17 @@
 // ============================================================
 
 import { MetadataRoute } from 'next'
-import { getSiteUrl } from './lib/site-url'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const siteUrl = getSiteUrl()
+  // On force l'URL de production — pas de variable d'environnement
+  const siteUrl = 'https://examenbenin.vercel.app'
 
   return [
     {
       url:             siteUrl,
       lastModified:    new Date(),
-      changeFrequency: 'daily',   // la page change souvent (nouvelles épreuves)
-      priority:        1.0,       // page la plus importante
+      changeFrequency: 'daily',
+      priority:        1.0,
     },
     {
       url:             `${siteUrl}/suggestions`,

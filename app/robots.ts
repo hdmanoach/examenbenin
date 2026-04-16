@@ -4,16 +4,13 @@
 // ============================================================
 
 import { MetadataRoute } from 'next'
-import { getSiteUrl } from './lib/site-url'
 
 export default function robots(): MetadataRoute.Robots {
-  const siteUrl = getSiteUrl()
-
   return {
     rules: {
       userAgent: '*',
-      allow:     '/',         // tout le site est indexable
+      allow:     '/',
     },
-    sitemap: `${siteUrl}/sitemap.xml`,
+    sitemap: 'https://examenbenin.vercel.app/sitemap.xml',
   }
 }
