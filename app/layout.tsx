@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { getSiteUrl } from './lib/site-url'
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examenbenin.vercel.app'
+const siteUrl = getSiteUrl()
 const siteName = 'ExamBénin'
 const siteTitle = 'ExamBénin | Épreuves et révisions des examens nationaux du Bénin'
 const siteDescription =
