@@ -141,6 +141,25 @@ export async function filtrerEpreuves(params: {
   }
   return data as Epreuve[]
 }
+// ── Récupérer les sessions et types disponibles pour une filière ──
+/** Utilisé par BarreFiltres pour afficher uniquement ce qui existe */
+export async function obtenirOptionsFiliere(filiere: string): Promise<{
+  sessions: Session[]
+  types:    TypeBloc[]
+}> {
+  const { data, error } = await supabase
+    .from('epreuves')
+    .select('session, type')
+    .eq('filiere', filiere)
+
+  if (error || !data) return { sessions: [], types: [] }
+
+  // Dédoublonner les valeurs
+  const sessions = [...new Set(data.map(e => e.session))] as Session[]
+  const types    = [...new Set(data.map(e => e.type))]    as TypeBloc[]
+
+  return { sessions, types }
+}
 
 /** Incrémenter le compteur de vues d'une épreuve */
 export async function incrementerVues(id: string): Promise<void> {

@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import {
-  BookOpen, GraduationCap, RefreshCw,
-  ChevronRight, RotateCcw, ExternalLink, MessageSquare,
+  RefreshCw, ChevronRight, RotateCcw,
+  ExternalLink, MessageSquare,
 } from 'lucide-react'
 
 import EcranIntro       from './components/EcranIntro'
@@ -33,16 +33,13 @@ interface FiltresActifs {
 }
 
 const FILTRES_PAR_DEFAUT: FiltresActifs = {
-  filiere: null, session: null, annee: null, type: null,
+  filiere: null, session: null, annee: null, type: 'epreuve',
 }
 
 // Nombre d'épreuves affichées par page
 const PAR_PAGE = 8
 
-type OngletActif = 'epreuves' | 'revision'
-
 export default function PagePrincipale() {
-  const [onglet, setOnglet]                       = useState<OngletActif>('epreuves')
   const [filtres, setFiltres]                     = useState<FiltresActifs>(FILTRES_PAR_DEFAUT)
   const [epreuveOuverte, setEpreuveOuverte]       = useState<Epreuve | null>(null)
   const [modalEmailVisible, setModalEmailVisible] = useState(false)
@@ -66,14 +63,11 @@ export default function PagePrincipale() {
   }, [])
 
   // ── Charger les épreuves filtrées ─────────────────────────
-  const chargerEpreuves = useCallback(async (
-    filtresActifs: FiltresActifs,
-    ongletActif: OngletActif
-  ) => {
+  const chargerEpreuves = useCallback(async (filtresActifs: FiltresActifs) => {
     setChargement(true)
     const resultats = await filtrerEpreuves({
       ...filtresActifs,
-      type: ongletActif === 'revision' ? 'revision' : 'epreuve',
+      type: filtresActifs.type || 'epreuve',  // par défaut épreuves officielles
     })
     setEpreuvesFiltrees(resultats)
     setPage(1) // Revenir à la page 1 à chaque rechargement
@@ -101,17 +95,17 @@ export default function PagePrincipale() {
         { event: '*', schema: 'public', table: 'epreuves' },
         () => {
           chargerStats()
-          chargerEpreuves(filtres, onglet)
+          chargerEpreuves(filtres)
         }
       )
       .subscribe()
     return () => { supabase.removeChannel(canal) }
-  }, [filtres, onglet, chargerStats, chargerEpreuves])
+  }, [filtres, chargerStats, chargerEpreuves])
 
-  // ── Recharger à chaque changement de filtre ou d'onglet ──
+  // ── Recharger à chaque changement de filtre ──────────────
   useEffect(() => {
-    chargerEpreuves(filtres, onglet)
-  }, [filtres, onglet, chargerEpreuves])
+    chargerEpreuves(filtres)
+  }, [filtres, chargerEpreuves])
 
   // ── Modal email après l'intro ────────────────────────────
   useEffect(() => {
@@ -141,7 +135,7 @@ export default function PagePrincipale() {
   }
 
   const reinitialiserFiltres = () => {
-    setFiltres(FILTRES_PAR_DEFAUT)
+    setFiltres({ ...FILTRES_PAR_DEFAUT, type: 'epreuve' })
     setPage(1)
   }
 
@@ -204,36 +198,10 @@ export default function PagePrincipale() {
           </div>
         </header>
 
-        {/* ══ ONGLETS ══════════════════════════════════════ */}
+        {/* ══ DESCRIPTION ══════════════════════════════════ */}
         <div className="max-w-6xl mx-auto px-6">
-          <div className="flex gap-2 bg-[#111a14] border border-[#1e2e21] rounded-2xl p-1.5 w-fit mb-8">
-            <button
-              onClick={() => { setOnglet('epreuves'); reinitialiserFiltres() }}
-              className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
-                onglet === 'epreuves'
-                  ? 'bg-[#008751] text-white shadow-lg shadow-[#008751]/30'
-                  : 'text-[#8fa895] hover:text-white'
-              }`}
-            >
-              <GraduationCap size={16} />
-              Épreuves officielles
-            </button>
-            <button
-              onClick={() => { setOnglet('revision'); reinitialiserFiltres() }}
-              className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
-                onglet === 'revision'
-                  ? 'bg-purple-700 text-white shadow-lg shadow-purple-700/30'
-                  : 'text-[#8fa895] hover:text-white'
-              }`}
-            >
-              <BookOpen size={16} />
-              Bloc Révision
-            </button>
-          </div>
           <p className="text-[#8fa895] text-sm mb-6">
-            {onglet === 'epreuves'
-              ? ' Toutes les épreuves officielles, filtrées par filière, session et année.'
-              : ' Documents de révision et anciennes épreuves pour renforcer tes connaissances.'}
+            Sélectionne une filière pour voir les sessions et types disponibles.
           </p>
         </div>
 
