@@ -237,17 +237,17 @@ export default function PagePrincipale() {
                 ))}
               </div>
 
-              {/* Pagination — s'affiche seulement s'il y a plus de 8 épreuves */}
+              {/* Pagination responsive */}
               {totalPages > 1 && (
-                <div className="flex items-center justify-between mt-8 pt-6 border-t border-[#1e2e21]">
+                <div className="flex flex-col sm:flex-row items-center justify-between mt-8 pt-6 border-t border-[#1e2e21] gap-4">
 
                   {/* Compteur */}
                   <p className="text-[#8fa895] text-xs">
                     Page {page} sur {totalPages} · {epreuvesFiltrees.length} épreuve{epreuvesFiltrees.length !== 1 ? 's' : ''}
                   </p>
 
-                  {/* Boutons de navigation */}
-                  <div className="flex gap-2 flex-wrap">
+                  {/* Boutons */}
+                  <div className="flex items-center gap-2">
 
                     {/* Précédent */}
                     <button
@@ -255,23 +255,42 @@ export default function PagePrincipale() {
                       disabled={page === 1}
                       className="px-3 py-1.5 text-xs rounded-xl bg-[#111a14] border border-[#1e2e21] text-[#8fa895] hover:text-white disabled:opacity-30 transition-all"
                     >
-                      ← Précédent
+                      ← Préc.
                     </button>
 
-                    {/* Numéros */}
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
-                      <button
-                        key={n}
-                        onClick={() => allerPage(n)}
-                        className={`w-8 h-8 text-xs rounded-xl transition-all ${
-                          page === n
-                            ? 'bg-[#008751] text-white'
-                            : 'bg-[#111a14] border border-[#1e2e21] text-[#8fa895] hover:text-white'
-                        }`}
-                      >
-                        {n}
-                      </button>
-                    ))}
+                    {/* Sur mobile : afficher seulement page courante et total */}
+                    <div className="flex gap-1">
+                      {Array.from({ length: totalPages }, (_, i) => i + 1)
+                        .filter(n =>
+                          // Sur mobile, afficher seulement les pages proches
+                          n === 1 || n === totalPages || Math.abs(n - page) <= 1
+                        )
+                        .reduce((acc: (number | string)[], n, i, arr) => {
+                          // Ajouter "..." si il y a un saut
+                          if (i > 0 && n - (arr[i - 1] as number) > 1) acc.push('...')
+                          acc.push(n)
+                          return acc
+                        }, [])
+                        .map((n, i) =>
+                          n === '...' ? (
+                            <span key={`dots-${i}`} className="w-8 h-8 flex items-center justify-center text-[#8fa895] text-xs">
+                              …
+                            </span>
+                          ) : (
+                            <button
+                              key={n}
+                              onClick={() => allerPage(n as number)}
+                              className={`w-8 h-8 text-xs rounded-xl transition-all ${
+                                page === n
+                                  ? 'bg-[#008751] text-white'
+                                  : 'bg-[#111a14] border border-[#1e2e21] text-[#8fa895] hover:text-white'
+                              }`}
+                            >
+                              {n}
+                            </button>
+                          )
+                        )}
+                    </div>
 
                     {/* Suivant */}
                     <button
@@ -279,7 +298,7 @@ export default function PagePrincipale() {
                       disabled={page === totalPages}
                       className="px-3 py-1.5 text-xs rounded-xl bg-[#111a14] border border-[#1e2e21] text-[#8fa895] hover:text-white disabled:opacity-30 transition-all"
                     >
-                      Suivant →
+                      Suiv. →
                     </button>
                   </div>
                 </div>
